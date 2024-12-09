@@ -28,8 +28,8 @@ jobs:
 
       # Tercer paso: Ejecutar las pruebas de la aplicación utilizando docker-compose
       - name: Test
-        run: docker-compose run --rm app sh -c "python manage.py test" # Corre los tests de Django dentro del contenedor "app"
+        run: docker compose run --rm app sh -c "python manage.py test" # Corre los tests de Django dentro del contenedor "app"
 
       # Cuarto paso: Ejecutar el análisis de linting utilizando flake8
       - name: Lint
-        run: docker-compose run --rm app sh -c "flake8" # Corre flake8 para verificar el estilo del código dentro del contenedor "app"
+        run: docker compose run --rm app sh -c "flake8" # Corre flake8 para verificar el estilo del código dentro del contenedor "app"
