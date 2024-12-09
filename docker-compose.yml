@@ -1,0 +1,24 @@
+# Define la versión del esquema de Docker Compose que se está utilizando
+version: '3.9'
+
+# Define los servicios que se ejecutarán como contenedores, en este caso 'app'
+services:
+  app:
+    # Construye la imagen desde un Dockerfile ubicado en el directorio actual
+    build: 
+      context: .
+      # Define un argumento de construcción para especificar si el entorno es de desarrollo
+      args:
+        - DEV=true
+    # Mapea el puerto 8000 del contenedor al puerto 8000 del host
+    # Esto permite que la aplicación sea accesible desde el host en http://localhost:8000
+    ports:
+      - "8000:8000"
+    # Mapea el directorio local `./app` al directorio `/app` dentro del contenedor
+    # Esto permite que los cambios realizados en el código local se reflejen dentro del contenedor en tiempo real
+    volumes:
+      - ./app:/app
+    # Comando para iniciar el contenedor. Aquí se ejecuta el servidor de desarrollo de Django
+    # Escucha en todas las interfaces (0.0.0.0) y utiliza el puerto 8000
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"

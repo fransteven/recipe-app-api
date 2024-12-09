@@ -1,0 +1,35 @@
+# Define el nombre del flujo de trabajo
+name: Checks
+
+# Define el evento que activa este flujo de trabajo, en este caso un push a cualquier rama
+on: [push]
+
+# Define los trabajos que se ejecutarán en este flujo de trabajo
+jobs:
+  # Nombre del job, en este caso "test-lint"
+  test-lint:
+    # Nombre visible del job en la interfaz de GitHub Actions
+    name: Test and Lint
+    # Define el sistema operativo donde se ejecutará el job
+    runs-on: ubuntu-20.04
+
+    # Define los pasos que se ejecutarán en este job
+    steps:
+      # Primer paso: Iniciar sesión en Docker Hub usando la acción oficial de Docker
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1 # Versión de la acción para iniciar sesión en Docker Hub
+        with:
+          username: ${{ secrets.DOCKERHUB_USER}} # Usuario de Docker Hub almacenado como un secreto
+          password: ${{ secrets.DOCKERHUB_TOKEN}} # Token de Docker Hub almacenado como un secreto
+
+      # Segundo paso: Realizar el checkout del código en el repositorio
+      - name: Checkout
+        uses: actions/checkout@v2 # Acción oficial de GitHub para hacer checkout del código fuente
+
+      # Tercer paso: Ejecutar las pruebas de la aplicación utilizando docker-compose
+      - name: Test
+        run: docker-compose run --rm app sh -c "python manage.py test" # Corre los tests de Django dentro del contenedor "app"
+
+      # Cuarto paso: Ejecutar el análisis de linting utilizando flake8
+      - name: Lint
+        run: docker-compose run --rm app sh -c "flake8" # Corre flake8 para verificar el estilo del código dentro del contenedor "app"
