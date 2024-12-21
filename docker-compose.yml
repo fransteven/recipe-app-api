@@ -1,8 +1,9 @@
 # Define la versión del esquema de Docker Compose que se está utilizando
 version: '3.9'
 
-# Define los servicios que se ejecutarán como contenedores, en este caso 'app'
+# Define los servicios que se ejecutarán como contenedores
 services:
+  # Servicio 'app', que representa la aplicación principal (por ejemplo, una app Django)
   app:
     # Construye la imagen desde un Dockerfile ubicado en el directorio actual
     build: 
@@ -11,14 +12,37 @@ services:
       args:
         - DEV=true
     # Mapea el puerto 8000 del contenedor al puerto 8000 del host
-    # Esto permite que la aplicación sea accesible desde el host en http://localhost:8000
     ports:
       - "8000:8000"
     # Mapea el directorio local `./app` al directorio `/app` dentro del contenedor
-    # Esto permite que los cambios realizados en el código local se reflejen dentro del contenedor en tiempo real
     volumes:
       - ./app:/app
-    # Comando para iniciar el contenedor. Aquí se ejecuta el servidor de desarrollo de Django
-    # Escucha en todas las interfaces (0.0.0.0) y utiliza el puerto 8000
+    # Comando para iniciar el contenedor ejecutando el servidor de desarrollo de Django
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
+    # Define variables de entorno para que el contenedor de la aplicación pueda conectarse a la base de datos
+    environment:
+      - DB_HOST=db  # Nombre del servicio de la base de datos definido más abajo
+      - DB_NAME=devdb  # Nombre de la base de datos
+      - DB_USER=devuser  # Usuario de la base de datos
+      - DB_PASS=changeme  # Contraseña del usuario de la base de datos
+    # Establece una dependencia, asegurando que el servicio 'db' esté listo antes de iniciar 'app'
+    depends_on:
+      - db
+
+  # Servicio 'db', que representa la base de datos PostgreSQL
+  db:
+    # Usa una imagen oficial de PostgreSQL, en este caso, una versión ligera (alpine)
+    image: postgres:13-alpine
+    # Define un volumen persistente para guardar los datos de la base de datos
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    # Configura variables de entorno para inicializar la base de datos
+    environment:
+      - POSTGRES_DB=devdb  # Nombre inicial de la base de datos
+      - POSTGRES_USER=devuser  # Usuario inicial de la base de datos
+      - POSTGRES_PASSWORD=changeme  # Contraseña inicial para el usuario
+
+# Define los volúmenes, en este caso, para persistir datos de la base de datos
+volumes:
+  dev-db-data:
