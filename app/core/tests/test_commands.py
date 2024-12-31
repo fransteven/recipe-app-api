@@ -16,7 +16,7 @@ class CommandTest(SimpleTestCase):
         #Llama al comando personalizado wait_for_db.
         #Como el método check devuelve True, el comando debería completarse inmediatamente.
         call_command('wait_for_db')
-        #Verifica que el método check se haya llamado una sola vez con el argumento database=['default'] (aunque esto contiene un error; debe ser databases=['default']).
+        #Verifica que el método check se haya llamado una sola vez con el argumento database=['default'] 
         patched_check.assert_called_once_with(databases=['default'])
 
     @patch('time.sleep')

@@ -19,7 +19,9 @@ services:
       - ./app:/app
     # Comando para iniciar el contenedor ejecutando el servidor de desarrollo de Django
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db &&
+            python manage.py migrate &&
+            python manage.py runserver 0.0.0.0:8000"
     # Define variables de entorno para que el contenedor de la aplicación pueda conectarse a la base de datos
     environment:
       - DB_HOST=db  # Nombre del servicio de la base de datos definido más abajo
